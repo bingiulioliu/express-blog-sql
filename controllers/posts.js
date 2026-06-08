@@ -4,7 +4,7 @@ import findSlug from "../middlewares/findSlug.js";
 import { createConnection } from 'mysql2/promise';
 
 
-function index(request, response) {
+async function index(request, response) {
 
     // Parametri per la query string
     const {
@@ -13,7 +13,21 @@ function index(request, response) {
         tag
     } = request.query;
 
-    
+    const query = `SELECT * FROM posts;`;
+
+    try {
+        // query() restituisce un array complesso. Usiamo la destrutturazione [rows]
+        // per estrarre solo la prima posizione, che contiene i dati effettivi.
+        const [rows] = await connection.query(query);
+        console.log(rows);
+
+    } catch (error) {
+        console.error('Errore nella query: ' + error.message);
+    }
+
+    // Quando abbiamo finito di usare il database, chiudiamo SEMPRE la connessione!
+    await connection.end();
+
     // Filter unico
     const filteredPosts = posts.filter(post => {
         // Filtro prep time
@@ -41,8 +55,8 @@ function index(request, response) {
                 return false;
             }
         }
-            return true;
-        })
+        return true;
+    })
     response.status(200).json(filteredPosts);
 }
 
@@ -62,7 +76,7 @@ function show(request, response) {
 }
 
 function create(request, response) {
-    
+
     const { slug, ...altro } = request.body;
 
     response.json({
@@ -76,7 +90,7 @@ function create(request, response) {
 }
 
 function destroy(request, response) {
-    const {slug, ...altro} = request.postFind;
+    const { slug, ...altro } = request.postFind;
 
     response.json({
         error: null,
@@ -87,11 +101,11 @@ function destroy(request, response) {
     });
 }
 
-function modify(request, response){
-    const {slug} = request.postFind;
+function modify(request, response) {
+    const { slug } = request.postFind;
 
     // Recupero l'oggetto salvato in modifyPost
-    const {updPost} = request
+    const { updPost } = request
 
     response.json({
         error: null,
