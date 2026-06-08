@@ -15,7 +15,7 @@ router.get('/', index)
 router.get('/:id', show);
 
 // CREATE
-router.post('/', createNewPost, create)
+router.post('/', create)
 
 // PATCH
 router.patch('/:id', modify)

@@ -1,11 +1,11 @@
 const queryInsertPost = `
     insert
     into posts (title, content, image)
-    values (?, ?);
+    values (?, ?, ?);
 `;
 
 const querySearchTag = `
-    select id, title
+    select id
     from tags t
     where t.label = ?;
 `;

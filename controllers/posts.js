@@ -2,6 +2,8 @@ import connection from "../data/db.js";
 import posts from "../data/posts.js";
 import findSlug from "../middlewares/findSlug.js";
 import { createConnection } from 'mysql2/promise';
+import { queryInsertPost, queryInsertTag, queryLinkTagPost, querySearchTag } from "../utils/queries.js";
+import { id } from "zod/locales";
 
 
 async function index(request, response) {
@@ -78,14 +80,51 @@ async function show(request, response) {
 
 async function create(request, response) {
 
-    const [title, content, image, label] = request.body;
+    const {title, content, image, label} = request.body;
 
+    
     try {
+        const [resultPost] = await connection.execute(queryInsertPost, [title, content, image]);
 
-    } catch {
+        // recupero il nuovo id autoincrementato
+        const postNewId = resultPost.insertId;
 
+        // ciclo tag
+        for (let i = 0; i < label.length; i++){
+            const tagName = label[i];
+            let tagId;
+
+            // check tag già presente
+            const [tagFound] = await connection.execute(querySearchTag, [tagName]);
+
+            // se il tag non c'è lo inserisco
+            if (tagFound.length === 0) {
+                const [newTag] = await connection.execute(queryInsertTag, [tagName]);
+                tagId = newTag.insertId;
+            } else {
+                tagId = tagFound[0].id;
+            }
+
+            // collego l'id del post con i tag
+            await connection.execute(queryLinkTagPost, [postNewId, tagId]);
+        }
+
+        // risposta in caso di successo
+        response.status(201).json({
+            error: null,
+            results: {
+                id: postNewId,
+                message: `Nuovo post creato con successo`
+            }
+        });
+
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            error: error.message,
+            results: null
+        });
     }
-
 }
 
 async function destroy(request, response) {
