@@ -1,18 +1,7 @@
+import connection from "../data/db.js";
 import posts from "../data/posts.js";
 import findSlug from "../middlewares/findSlug.js";
 import { createConnection } from 'mysql2/promise';
-
-
-const connection = await createConnection({
-    host: process.env.DB_HOSTNAME,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE
-});
-
-
-
 
 
 function index(request, response) {
