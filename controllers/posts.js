@@ -7,7 +7,7 @@ import { createConnection } from 'mysql2/promise';
 async function index(request, response) {
     try {
         const [rows] = await connection.query('SELECT id, title, content, image FROM posts;');
-        
+
         response.json({
             error: null,
             results: rows
@@ -22,17 +22,39 @@ async function index(request, response) {
     }
 }
 
-function show(request, response) {
+async function show(request, response) {
 
-    const { slug, ...altro } = request.postFind;
+    const {id} = request.params;
 
-    response.json({
-        error: null,
-        messaggio: `Stai visualizzando il post con slug ${slug}`,
-        results: {
-            ...altro
+    // query con placeholder per sicurezza
+    const query = `
+        select id, title, content, image
+        from posts p
+        where p.id = ?
+    `;
+
+    try {
+        const [rows] = await connection.execute (query, [id]);
+
+        // controllo se array vuoto
+        if (rows.length === 0){
+            return response.status(404).json({
+                error: 'Post non trovato',
+                results: null
+            });
         }
-    });
+        // se il post esiste
+        const post = rows[0];
+
+        // query per i tag
+        const queryTags = `
+        select
+        from post_tag pt
+            join tags t 
+                on pt.tag_id = t.id
+        where pt.post.id = ?
+        `;
+    }
 
 }
 

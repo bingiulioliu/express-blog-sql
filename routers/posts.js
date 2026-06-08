@@ -12,7 +12,7 @@ const router = express.Router();
 router.get('/', index)
 
 // SHOW hhtp://localhost:5555/posts/ciambellone
-router.get('/:slug',findSlug, show);
+router.get('/:id', show);
 
 // CREATE
 router.post('/', createNewPost, create)
