@@ -14,7 +14,7 @@ async function index(request, response) {
         });
     } catch (error) {
         console.error(error);
-        
+
         response.status(500).json({
             error: 'Errore caricamento',
             results: []
@@ -24,7 +24,7 @@ async function index(request, response) {
 
 async function show(request, response) {
 
-    const {id} = request.params;
+    const { id } = request.params;
 
     // query con placeholder per sicurezza
     const query = `
@@ -34,10 +34,10 @@ async function show(request, response) {
     `;
 
     try {
-        const [rows] = await connection.execute (query, [id]);
+        const [rows] = await connection.execute(query, [id]);
 
         // controllo se array vuoto
-        if (rows.length === 0){
+        if (rows.length === 0) {
             return response.status(404).json({
                 error: 'Post non trovato',
                 results: null
@@ -72,7 +72,7 @@ async function show(request, response) {
             results: null
         });
         console.log(error);
-        
+
     }
 }
 
@@ -90,32 +90,56 @@ function create(request, response) {
     });
 }
 
-function destroy(request, response) {
-    const { slug, ...altro } = request.postFind;
+async function destroy(request, response) {
 
-    response.json({
-        error: null,
-        messaggio: `Stai eliminando il post con slug ${slug}`,
-        results: {
-            ...altro
+    const { id } = request.params;
+
+    // query con placeholder per sicurezza
+    const query = `
+        delete
+        from posts p
+        where p.id = ?
+    `;
+
+    try {
+        const [results] = await connection.execute(query, [id]);
+
+        // controllo se array vuoto
+        if (results.affectedRows === 0) {
+            return response.status(404).json({
+                error: 'Post non trovato',
+                results: null
+            });
         }
-    });
+        // se il post esiste
+        response.json({
+            message: `Post con ID ${id} eliminato con successo`
+        })
+
+    }catch (error) {
+        response.status(500).json({
+            error: 'È successo qualcosa',
+            results: null
+        });
+        console.log(error);
+
+    }
 }
 
 function modify(request, response) {
-    const { slug } = request.postFind;
+        const { slug } = request.postFind;
 
-    // Recupero l'oggetto salvato in modifyPost
-    const { updPost } = request
+        // Recupero l'oggetto salvato in modifyPost
+        const { updPost } = request
 
-    response.json({
-        error: null,
-        messaggio: `Richiesta di modifica per post con slug ${slug}`,
-        results: updPost
-    })
-}
+        response.json({
+            error: null,
+            messaggio: `Richiesta di modifica per post con slug ${slug}`,
+            results: updPost
+        })
+    }
 
 
-export {
-    index, show, create, destroy, modify
-}
+    export {
+        index, show, create, destroy, modify
+    }
