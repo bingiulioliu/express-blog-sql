@@ -48,14 +48,32 @@ async function show(request, response) {
 
         // query per i tag
         const queryTags = `
-        select
+        select t.label
         from post_tag pt
             join tags t 
                 on pt.tag_id = t.id
-        where pt.post.id = ?
+        where pt.post_id = ?
         `;
-    }
 
+        // con lo stesso id associo i tag correlati
+        const [tags] = await connection.execute(queryTags, [id]);
+
+        // al post attacco i tag associati
+        post.tags = tags;
+
+        response.json({
+            error: null,
+            results: post
+        });
+
+    } catch (error) {
+        response.status(500).json({
+            error: 'È successo qualcosa',
+            results: null
+        });
+        console.log(error);
+        
+    }
 }
 
 function create(request, response) {
