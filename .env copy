@@ -1,2 +1,7 @@
 PORT=
 URL=
+DB_HOSTNAME=localhost
+DB_PORT=
+DB_USERNAME=
+DB_PASSWORD=LaTuaPasswordSegreta
+DB_DATABASE=
