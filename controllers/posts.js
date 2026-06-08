@@ -5,63 +5,24 @@ import { createConnection } from 'mysql2/promise';
 
 
 async function index(request, response) {
-
-    // Parametri per la query string
-    const {
-        title,
-        maxPrepTime,
-        tag
-    } = request.query;
-
-    const query = `SELECT * FROM posts;`;
-
     try {
-        // query() restituisce un array complesso. Usiamo la destrutturazione [rows]
-        // per estrarre solo la prima posizione, che contiene i dati effettivi.
-        const [rows] = await connection.query(query);
-        console.log(rows);
-
+        const [rows] = await connection.query('SELECT id, title, content, image FROM posts;');
+        
+        response.json({
+            error: null,
+            results: rows
+        });
     } catch (error) {
-        console.error('Errore nella query: ' + error.message);
+        console.error(error);
+        
+        response.status(500).json({
+            error: 'Errore caricamento',
+            results: []
+        });
     }
-
-    // Quando abbiamo finito di usare il database, chiudiamo SEMPRE la connessione!
-    await connection.end();
-
-    // Filter unico
-    const filteredPosts = posts.filter(post => {
-        // Filtro prep time
-        const prepTimeReal = Number(maxPrepTime);
-        // Escludo i post con prep time non validi
-        if (!isNaN(prepTimeReal) && post.prep_time > prepTimeReal) {
-            return false;
-        }
-        // Filtro nome
-        if (title !== undefined && name !== '') {
-            const nameLower = name.toLowerCase();
-            const postNameLower = post.title.toLowerCase();
-
-            if (!postNameLower.includes(nameLower)) {
-                return false;
-            }
-        }
-        // Filtro tag
-        if (tag !== undefined && tag !== '') {
-            const tagLower = tag.toLowerCase();
-
-            const hasTag = post.tags.map(tag => tag.toLowerCase()).includes(tagLower);
-
-            if (!hasTag) {
-                return false;
-            }
-        }
-        return true;
-    })
-    response.status(200).json(filteredPosts);
 }
 
 function show(request, response) {
-    // Recuper l'ID dai params
 
     const { slug, ...altro } = request.postFind;
 

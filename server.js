@@ -1,7 +1,7 @@
 import express from 'express';
 import postsRouter from './routers/posts.js'
 import notFound from './middlewares/notFound.js';
-import connection from './data/db.js'; // Importa la connessione configurata
+
 
 
 const app = express();
