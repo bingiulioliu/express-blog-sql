@@ -76,18 +76,16 @@ async function show(request, response) {
     }
 }
 
-function create(request, response) {
+async function create(request, response) {
 
-    const { slug, ...altro } = request.body;
+    const [title, content, image, label] = request.body;
 
-    response.json({
-        error: null,
-        messaggio: `Hai creato il post con slug ${slug}`,
-        results: {
-            slug,
-            ...altro
-        }
-    });
+    try {
+
+    } catch {
+
+    }
+
 }
 
 async function destroy(request, response) {
